@@ -1,9 +1,11 @@
+import dynamic from "next/dynamic";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import MicroserviceDiagram from "@/components/MicroserviceDiagram";
 import ServiceCard from "@/components/ServiceCard";
-import EventFlowVisualizer from "@/components/EventFlowVisualizer";
-import MetricsPanel from "@/components/MetricsPanel";
+
+const MicroserviceDiagram = dynamic(() => import("@/components/MicroserviceDiagram"), { ssr: false });
+const EventFlowVisualizer = dynamic(() => import("@/components/EventFlowVisualizer"), { ssr: false });
+const MetricsPanel = dynamic(() => import("@/components/MetricsPanel"), { ssr: false });
 import {
   Cpu,
   Zap,
@@ -15,8 +17,9 @@ import {
   Network,
   ArrowRight,
   Code2,
-  Server,
   Radio,
+  Terminal,
+  Server,
 } from "lucide-react";
 
 const SERVICES = [
@@ -25,9 +28,9 @@ const SERVICES = [
     port: 8000,
     description:
       "Central entry point for all client requests. Handles rate limiting (sliding window), circuit breaking, request proxying, and service discovery with health checking.",
-    color: "#8b5cf6",
-    glowColor: "#6d28d9",
-    icon: <Network className="w-5 h-5" />,
+    color: "#10B981",
+    glowColor: "#064E3B",
+    icon: <Network className="w-4 h-4" />,
     features: ["Rate Limiting", "Circuit Breaker", "Service Discovery", "Request Proxying"],
     endpoints: [
       { method: "GET" as const, path: "/api/v1/health", description: "Health status" },
@@ -39,26 +42,26 @@ const SERVICES = [
     name: "AI Inference",
     port: 8001,
     description:
-      "Async LLM inference service with LRU response caching (SHA-256 key), asyncio.Semaphore concurrency limiting, and batch fan-out via asyncio.gather.",
-    color: "#06b6d4",
-    glowColor: "#0891b2",
-    icon: <Cpu className="w-5 h-5" />,
+      "Async LLM inference with LRU response caching (SHA-256 key), asyncio.Semaphore concurrency limiting, and batch fan-out via asyncio.gather.",
+    color: "#34D399",
+    glowColor: "#065F46",
+    icon: <Cpu className="w-4 h-4" />,
     features: ["LRU Cache", "Batch Processing", "Semaphore Guard", "OpenAI Compatible"],
     endpoints: [
       { method: "POST" as const, path: "/api/v1/completions", description: "Chat completion" },
       { method: "POST" as const, path: "/api/v1/completions/batch", description: "Batch" },
       { method: "POST" as const, path: "/api/v1/embeddings", description: "Embeddings" },
-      { method: "GET" as const, path: "/api/v1/health", description: "Health + cache stats" },
+      { method: "GET" as const, path: "/api/v1/health", description: "Cache stats" },
     ],
   },
   {
     name: "Document Processor",
     port: 8002,
     description:
-      "5-stage async processing pipeline: validation → cleaning → entity extraction → summarisation → MongoDB storage. Background tasks with progress tracking.",
-    color: "#10b981",
-    glowColor: "#059669",
-    icon: <Database className="w-5 h-5" />,
+      "5-stage async pipeline: validation → cleaning → entity extraction → summarisation → MongoDB storage. Background tasks with progress tracking.",
+    color: "#6EE7B7",
+    glowColor: "#047857",
+    icon: <Database className="w-4 h-4" />,
     features: ["5-Stage Pipeline", "MongoDB/In-Memory", "Entity Extraction", "Background Tasks"],
     endpoints: [
       { method: "POST" as const, path: "/api/v1/documents", description: "Upload & process" },
@@ -73,9 +76,9 @@ const SERVICES = [
     port: 8003,
     description:
       "In-memory async pub/sub broker with topic routing, exponential-backoff retry (up to N attempts), dead-letter queue, and DLQ replay endpoint.",
-    color: "#f59e0b",
-    glowColor: "#d97706",
-    icon: <Radio className="w-5 h-5" />,
+    color: "#A7F3D0",
+    glowColor: "#059669",
+    icon: <Radio className="w-4 h-4" />,
     features: ["Pub/Sub Topics", "Retry + Backoff", "Dead Letter Queue", "DLQ Replay"],
     endpoints: [
       { method: "POST" as const, path: "/api/v1/events/publish", description: "Publish event" },
@@ -89,38 +92,38 @@ const SERVICES = [
 
 const HIGHLIGHTS = [
   {
-    icon: <Zap className="w-6 h-6" />,
-    color: "#3b82f6",
+    icon: <Zap className="w-5 h-5" />,
+    color: "#10B981",
     title: "Async-First",
     desc: "Every I/O operation uses asyncio — zero blocking calls. From HTTP proxying to MongoDB writes.",
   },
   {
-    icon: <Shield className="w-6 h-6" />,
-    color: "#8b5cf6",
+    icon: <Shield className="w-5 h-5" />,
+    color: "#34D399",
     title: "Circuit Breaker",
     desc: "3-state FSM (CLOSED → OPEN → HALF_OPEN) prevents cascade failures across services.",
   },
   {
-    icon: <Activity className="w-6 h-6" />,
-    color: "#10b981",
+    icon: <Activity className="w-5 h-5" />,
+    color: "#6EE7B7",
     title: "Rate Limiting",
     desc: "Sliding-window token bucket per-IP with Redis-ready architecture and Retry-After headers.",
   },
   {
-    icon: <GitBranch className="w-6 h-6" />,
-    color: "#06b6d4",
+    icon: <GitBranch className="w-5 h-5" />,
+    color: "#10B981",
     title: "Event-Driven",
     desc: "Decoupled services communicate via async pub/sub with guaranteed delivery and replay.",
   },
   {
-    icon: <Database className="w-6 h-6" />,
-    color: "#f59e0b",
+    icon: <Database className="w-5 h-5" />,
+    color: "#34D399",
     title: "Smart Caching",
     desc: "SHA-256 keyed LRU cache with TTL. Cache hit rate tracked with hit/miss counters.",
   },
   {
-    icon: <Box className="w-6 h-6" />,
-    color: "#ef4444",
+    icon: <Box className="w-5 h-5" />,
+    color: "#6EE7B7",
     title: "Docker Orchestration",
     desc: "Full Docker Compose with health checks, restart policies, and named volumes.",
   },
@@ -128,7 +131,7 @@ const HIGHLIGHTS = [
 
 const CODE_EXAMPLES = [
   {
-    title: "Circuit Breaker",
+    title: "circuit_breaker.py",
     lang: "python",
     code: `@dataclass
 class CircuitBreaker:
@@ -156,7 +159,7 @@ class CircuitBreaker:
             raise`,
   },
   {
-    title: "Batch Inference",
+    title: "inference_service.py",
     lang: "python",
     code: `class InferenceService:
     def __init__(self, cache: ResponseCache):
@@ -178,12 +181,12 @@ class CircuitBreaker:
         return CompletionResponse(...)
 
     async def complete_batch(self, reqs):
-        return await asyncio.gather(     # fan-out
+        return await asyncio.gather(   # fan-out
             *[self.complete(r) for r in reqs]
         )`,
   },
   {
-    title: "Event Broker Dispatch",
+    title: "event_broker.py",
     lang: "python",
     code: `async def _dispatch(self, event: Event) -> None:
     handlers = self._subscribers.get(event.topic, [])
@@ -199,10 +202,10 @@ class CircuitBreaker:
                     handler(event), timeout=self._timeout
                 )
                 break
-            except Exception as exc:
+            except Exception:
                 event.retry_count += 1
                 await asyncio.sleep(
-                    min(2 ** (attempt - 1), 10)  # exp backoff
+                    min(2 ** (attempt - 1), 10)
                 )
         else:
             event.status = EventStatus.FAILED
@@ -219,63 +222,70 @@ export default function HomePage() {
       <Header />
 
       {/* Hero */}
-      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        {/* Background gradient */}
+      <section className="pt-36 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        {/* Background glow */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59,130,246,0.12), transparent)",
+              "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(16,185,129,0.06), transparent)",
           }}
         />
+
         <div className="max-w-5xl mx-auto relative">
-          {/* Badge */}
+          {/* System status badge */}
           <div className="flex justify-center mb-6">
             <div
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded text-xs font-mono"
               style={{
-                background: "rgba(59,130,246,0.1)",
-                border: "1px solid rgba(59,130,246,0.3)",
-                color: "#60a5fa",
+                background: "rgba(2,44,34,0.6)",
+                border: "1px solid rgba(16,185,129,0.3)",
+                color: "var(--em-400)",
               }}
             >
-              <Server className="w-4 h-4" />
-              Senior Python + AI Engineer · $6,000/mo Portfolio
+              <Server className="w-3.5 h-3.5" />
+              <span style={{ color: "var(--em-300)" }}>SYS:</span>
+              Senior Python + AI Engineer &nbsp;·&nbsp;
+              <span style={{ color: "var(--em-500)" }}>$6,000/mo</span> Portfolio
             </div>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-center leading-tight mb-6">
-            <span className="text-gradient">async-ai-microservices</span>
+          {/* Title */}
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-center leading-tight mb-4 font-mono">
+            <span className="text-gradient-em">async-ai-microservices</span>
           </h1>
 
+          {/* Subtitle */}
           <p
-            className="text-lg sm:text-xl text-center max-w-3xl mx-auto mb-10 leading-relaxed"
+            className="text-sm sm:text-base text-center max-w-3xl mx-auto mb-8 leading-relaxed font-mono"
             style={{ color: "var(--text-secondary)" }}
           >
             Production-grade async Python microservices platform demonstrating API Gateway patterns,
             event-driven architecture, circuit breaking, LRU caching, and MongoDB integration.
-            Built with FastAPI + Pydantic v2 + asyncio.
+            Built with <span style={{ color: "var(--em-400)" }}>FastAPI</span> +{" "}
+            <span style={{ color: "var(--em-400)" }}>Pydantic v2</span> +{" "}
+            <span style={{ color: "var(--em-400)" }}>asyncio</span>.
           </p>
 
           {/* Tech badges */}
-          <div className="flex flex-wrap justify-center gap-3 mb-12">
+          <div className="flex flex-wrap justify-center gap-2 mb-10">
             {[
-              { label: "Python 3.11", color: "#3b82f6" },
-              { label: "FastAPI", color: "#06b6d4" },
-              { label: "Pydantic v2", color: "#8b5cf6" },
-              { label: "asyncio", color: "#10b981" },
-              { label: "MongoDB", color: "#4ade80" },
-              { label: "Redis", color: "#ef4444" },
-              { label: "Docker", color: "#60a5fa" },
-              { label: "pytest-asyncio", color: "#f59e0b" },
+              { label: "Python 3.11" },
+              { label: "FastAPI" },
+              { label: "Pydantic v2" },
+              { label: "asyncio" },
+              { label: "MongoDB" },
+              { label: "Redis" },
+              { label: "Docker" },
+              { label: "pytest-asyncio" },
             ].map((b) => (
               <span
                 key={b.label}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium"
+                className="px-2.5 py-1 rounded text-xs font-mono"
                 style={{
-                  background: `${b.color}15`,
-                  border: `1px solid ${b.color}35`,
-                  color: b.color,
+                  background: "rgba(16,185,129,0.08)",
+                  border: "1px solid rgba(16,185,129,0.2)",
+                  color: "var(--em-400)",
                 }}
               >
                 {b.label}
@@ -284,36 +294,103 @@ export default function HomePage() {
           </div>
 
           {/* CTA buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <a
               href="#architecture"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all duration-200 hover:brightness-110"
-              style={{ background: "linear-gradient(135deg, #3b82f6, #6d28d9)" }}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded font-mono text-sm font-semibold transition-all duration-200"
+              style={{
+                background: "linear-gradient(135deg, #022C22, #065F46)",
+                border: "1px solid rgba(16,185,129,0.4)",
+                color: "#34D399",
+                boxShadow: "0 0 20px rgba(16,185,129,0.15)",
+              }}
             >
+              <Terminal className="w-4 h-4" />
               Explore Architecture
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-3.5 h-3.5" />
             </a>
             <a
               href="/demo"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded font-mono text-sm font-medium transition-all duration-200"
               style={{
-                border: "1px solid rgba(59,130,246,0.4)",
-                color: "#60a5fa",
+                border: "1px solid rgba(16,185,129,0.25)",
+                color: "var(--em-400)",
               }}
             >
               <Code2 className="w-4 h-4" />
               Interactive Demo
             </a>
           </div>
+
+          {/* Terminal preview */}
+          <div
+            className="mt-12 rounded-lg overflow-hidden mx-auto max-w-2xl"
+            style={{
+              background: "#010806",
+              border: "1px solid rgba(16,185,129,0.15)",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(16,185,129,0.05)",
+            }}
+          >
+            <div className="terminal-header">
+              <span className="terminal-dot" style={{ background: "#EF4444" }} />
+              <span className="terminal-dot" style={{ background: "#F59E0B" }} />
+              <span className="terminal-dot" style={{ background: "#10B981" }} />
+              <span className="ml-3 text-xs font-mono" style={{ color: "var(--text-muted)" }}>
+                terminal — bash
+              </span>
+            </div>
+            <div className="p-5 font-mono text-sm space-y-2">
+              <div style={{ color: "var(--text-muted)" }}>
+                <span style={{ color: "var(--em-500)" }}>❯</span>{" "}
+                <span style={{ color: "var(--em-400)" }}>git clone</span>{" "}
+                <span style={{ color: "#E2FFF5" }}>github.com/user/async-ai-microservices</span>
+              </div>
+              <div style={{ color: "var(--text-muted)" }}>
+                <span style={{ color: "var(--em-500)" }}>❯</span>{" "}
+                <span style={{ color: "var(--em-400)" }}>docker-compose up</span>{" "}
+                <span style={{ color: "#E2FFF5" }}>--build</span>
+              </div>
+              <div style={{ color: "var(--text-muted)" }}>
+                <span style={{ color: "var(--text-muted)" }}>#</span>{" "}
+                <span style={{ color: "#34D399" }}>✓</span>{" "}
+                <span>Gateway running on</span>{" "}
+                <span style={{ color: "var(--em-400)" }}>http://localhost:8000</span>
+              </div>
+              <div style={{ color: "var(--text-muted)" }}>
+                <span style={{ color: "var(--text-muted)" }}>#</span>{" "}
+                <span style={{ color: "#34D399" }}>✓</span>{" "}
+                <span>AI Inference on</span>{" "}
+                <span style={{ color: "var(--em-400)" }}>http://localhost:8001</span>
+              </div>
+              <div style={{ color: "var(--text-muted)" }}>
+                <span style={{ color: "var(--text-muted)" }}>#</span>{" "}
+                <span style={{ color: "#34D399" }}>✓</span>{" "}
+                <span>4 services · MongoDB · Redis — all healthy</span>
+              </div>
+              <div>
+                <span style={{ color: "var(--em-500)" }}>❯</span>{" "}
+                <span className="inline-block w-2 h-4 align-middle"
+                  style={{ background: "var(--em-500)", animation: "terminal-cursor 1s step-end infinite" }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Architecture Diagram */}
+      {/* Architecture */}
       <section id="architecture" className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-white mb-3">Architecture Overview</h2>
-            <p className="text-base" style={{ color: "var(--text-secondary)" }}>
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs font-mono uppercase tracking-widest" style={{ color: "var(--em-500)" }}>
+                01 / Architecture
+              </span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold font-mono" style={{ color: "#E2FFF5" }}>
+              System Architecture
+            </h2>
+            <p className="text-sm mt-2 font-mono" style={{ color: "var(--text-secondary)" }}>
               Four independent services orchestrated via Docker Compose with a unified API Gateway
             </p>
           </div>
@@ -324,22 +401,34 @@ export default function HomePage() {
       {/* Highlights */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-white text-center mb-10">Key Technical Highlights</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="mb-8">
+            <span className="text-xs font-mono uppercase tracking-widest" style={{ color: "var(--em-500)" }}>
+              02 / Highlights
+            </span>
+            <h2 className="text-2xl font-bold font-mono mt-2" style={{ color: "#E2FFF5" }}>
+              Key Technical Highlights
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {HIGHLIGHTS.map((h) => (
               <div
                 key={h.title}
-                className="rounded-xl p-5 glass card-hover"
-                style={{ border: `1px solid ${h.color}20` }}
+                className="rounded-lg p-4 card-hover-em"
+                style={{
+                  background: "var(--bg-card)",
+                  border: `1px solid ${h.color}18`,
+                }}
               >
                 <div
-                  className="w-11 h-11 rounded-lg flex items-center justify-center mb-4"
-                  style={{ background: `${h.color}15`, color: h.color }}
+                  className="w-9 h-9 rounded flex items-center justify-center mb-3"
+                  style={{ background: `${h.color}12`, color: h.color, border: `1px solid ${h.color}25` }}
                 >
                   {h.icon}
                 </div>
-                <h3 className="font-bold text-white mb-2">{h.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                <h3 className="font-mono font-bold text-sm mb-1.5" style={{ color: "#E2FFF5" }}>
+                  {h.title}
+                </h3>
+                <p className="text-xs font-mono leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                   {h.desc}
                 </p>
               </div>
@@ -351,13 +440,18 @@ export default function HomePage() {
       {/* Services */}
       <section id="services" className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-white mb-3">Microservices</h2>
-            <p style={{ color: "var(--text-secondary)" }}>
+          <div className="mb-8">
+            <span className="text-xs font-mono uppercase tracking-widest" style={{ color: "var(--em-500)" }}>
+              03 / Services
+            </span>
+            <h2 className="text-2xl font-bold font-mono mt-2" style={{ color: "#E2FFF5" }}>
+              Microservices
+            </h2>
+            <p className="text-sm mt-1 font-mono" style={{ color: "var(--text-secondary)" }}>
               Each service is a standalone FastAPI app with its own pyproject.toml, Dockerfile, and test suite
             </p>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {SERVICES.map((svc) => (
               <ServiceCard key={svc.name} {...svc} />
             ))}
@@ -368,46 +462,55 @@ export default function HomePage() {
       {/* Event Flow + Metrics */}
       <section id="events" className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-white mb-3">Event-Driven Architecture</h2>
-            <p style={{ color: "var(--text-secondary)" }}>
+          <div className="mb-8">
+            <span className="text-xs font-mono uppercase tracking-widest" style={{ color: "var(--em-500)" }}>
+              04 / Event System
+            </span>
+            <h2 className="text-2xl font-bold font-mono mt-2" style={{ color: "#E2FFF5" }}>
+              Event-Driven Architecture
+            </h2>
+            <p className="text-sm mt-1 font-mono" style={{ color: "var(--text-secondary)" }}>
               Async pub/sub with topic routing, retry backoff, and dead-letter queue
             </p>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <EventFlowVisualizer />
-            <div className="space-y-4">
-              {/* Pattern cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+            <div className="lg:col-span-3">
+              <EventFlowVisualizer />
+            </div>
+            <div className="lg:col-span-2 space-y-3">
               {[
                 {
                   title: "Publish/Subscribe",
-                  color: "#f59e0b",
+                  color: "#10B981",
                   desc: "Services publish domain events to named topics. Multiple handlers can subscribe to the same topic, enabling fan-out without tight coupling.",
                 },
                 {
                   title: "Exponential Backoff Retry",
-                  color: "#06b6d4",
+                  color: "#34D399",
                   desc: "Failed handlers retry up to N times with delay = min(2^attempt, 10)s. This prevents thundering-herd when a downstream service recovers.",
                 },
                 {
                   title: "Dead Letter Queue",
-                  color: "#ef4444",
+                  color: "#EF4444",
                   desc: "Events exhausting all retries are moved to DLQ for inspection. A /replay endpoint re-publishes them after the root cause is resolved.",
                 },
               ].map((item) => (
                 <div
                   key={item.title}
-                  className="rounded-xl p-5 glass"
-                  style={{ border: `1px solid ${item.color}25` }}
+                  className="rounded-lg p-4"
+                  style={{
+                    background: "var(--bg-card)",
+                    border: `1px solid ${item.color}20`,
+                  }}
                 >
-                  <h4 className="font-bold text-white mb-2 flex items-center gap-2">
+                  <h4 className="font-mono font-bold text-sm mb-2 flex items-center gap-2" style={{ color: "#E2FFF5" }}>
                     <span
-                      className="w-2 h-2 rounded-full flex-shrink-0"
+                      className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                       style={{ background: item.color }}
                     />
                     {item.title}
                   </h4>
-                  <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                  <p className="text-xs font-mono leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                     {item.desc}
                   </p>
                 </div>
@@ -420,9 +523,14 @@ export default function HomePage() {
       {/* Metrics */}
       <section id="metrics" className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-white mb-3">Live Metrics</h2>
-            <p style={{ color: "var(--text-secondary)" }}>
+          <div className="mb-8">
+            <span className="text-xs font-mono uppercase tracking-widest" style={{ color: "var(--em-500)" }}>
+              05 / Observability
+            </span>
+            <h2 className="text-2xl font-bold font-mono mt-2" style={{ color: "#E2FFF5" }}>
+              Live Metrics
+            </h2>
+            <p className="text-sm mt-1 font-mono" style={{ color: "var(--text-secondary)" }}>
               Simulated production telemetry — in production, powered by Prometheus + Grafana
             </p>
           </div>
@@ -431,45 +539,49 @@ export default function HomePage() {
       </section>
 
       {/* Code Examples */}
-      <section id="api" className="py-16 px-4 sm:px-6 lg:px-8">
+      <section id="code" className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-white mb-3">Code Highlights</h2>
-            <p style={{ color: "var(--text-secondary)" }}>
+          <div className="mb-8">
+            <span className="text-xs font-mono uppercase tracking-widest" style={{ color: "var(--em-500)" }}>
+              06 / Code
+            </span>
+            <h2 className="text-2xl font-bold font-mono mt-2" style={{ color: "#E2FFF5" }}>
+              Code Highlights
+            </h2>
+            <p className="text-sm mt-1 font-mono" style={{ color: "var(--text-secondary)" }}>
               Key patterns implemented with production-quality async Python
             </p>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {CODE_EXAMPLES.map((ex) => (
               <div
                 key={ex.title}
-                className="rounded-xl overflow-hidden glass"
-                style={{ border: "1px solid rgba(59,130,246,0.15)" }}
+                className="rounded-lg overflow-hidden"
+                style={{
+                  background: "#010806",
+                  border: "1px solid rgba(16,185,129,0.12)",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
+                }}
               >
-                <div
-                  className="px-4 py-3 flex items-center gap-2"
-                  style={{
-                    background: "rgba(6,12,24,0.8)",
-                    borderBottom: "1px solid rgba(59,130,246,0.1)",
-                  }}
-                >
-                  <div className="flex gap-1.5">
-                    <span className="w-3 h-3 rounded-full bg-red-500/70" />
-                    <span className="w-3 h-3 rounded-full bg-yellow-500/70" />
-                    <span className="w-3 h-3 rounded-full bg-green-500/70" />
-                  </div>
-                  <span className="text-xs font-medium ml-2" style={{ color: "#60a5fa" }}>
+                <div className="terminal-header">
+                  <span className="terminal-dot" style={{ background: "#EF4444" }} />
+                  <span className="terminal-dot" style={{ background: "#F59E0B" }} />
+                  <span className="terminal-dot" style={{ background: "#10B981" }} />
+                  <span className="ml-3 text-xs font-mono" style={{ color: "var(--em-400)" }}>
                     {ex.title}
                   </span>
                   <span
-                    className="ml-auto text-xs px-2 py-0.5 rounded"
-                    style={{ background: "rgba(59,130,246,0.1)", color: "#93c5fd" }}
+                    className="ml-auto text-xs font-mono px-1.5 py-0.5 rounded"
+                    style={{ background: "rgba(16,185,129,0.1)", color: "var(--text-muted)" }}
                   >
                     {ex.lang}
                   </span>
                 </div>
-                <pre className="code-block p-4 overflow-x-auto text-xs leading-relaxed m-0 rounded-none border-0">
-                  <code style={{ color: "#c9d8f5" }}>{ex.code}</code>
+                <pre
+                  className="p-4 overflow-x-auto font-mono"
+                  style={{ fontSize: "0.7rem", lineHeight: 1.75, color: "#A7F3D0" }}
+                >
+                  <code>{ex.code}</code>
                 </pre>
               </div>
             ))}
@@ -477,42 +589,59 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Docker Compose section */}
+      {/* CTA / Docker */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <div
-            className="rounded-2xl p-8 glass text-center"
-            style={{ border: "1px solid rgba(59,130,246,0.2)" }}
+            className="rounded-lg p-8"
+            style={{
+              background: "var(--bg-card)",
+              border: "1px solid rgba(16,185,129,0.2)",
+              boxShadow: "0 0 40px rgba(16,185,129,0.06)",
+            }}
           >
-            <div
-              className="w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-5"
-              style={{ background: "rgba(59,130,246,0.1)", color: "#60a5fa" }}
-            >
-              <Box className="w-7 h-7" />
+            <div className="flex items-center gap-3 mb-5">
+              <div
+                className="w-10 h-10 rounded flex items-center justify-center"
+                style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)" }}
+              >
+                <Box className="w-5 h-5" style={{ color: "var(--em-500)" }} />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold font-mono" style={{ color: "#E2FFF5" }}>
+                  One Command to Run
+                </h2>
+                <p className="text-xs font-mono mt-0.5" style={{ color: "var(--text-secondary)" }}>
+                  All 6 containers — gateway, 3 microservices, MongoDB, Redis
+                </p>
+              </div>
             </div>
-            <h2 className="text-2xl font-bold text-white mb-3">One Command to Run</h2>
-            <p className="mb-6" style={{ color: "var(--text-secondary)" }}>
-              All 6 containers — gateway, 3 microservices, MongoDB, Redis — start with a single command.
-            </p>
+
             <div
-              className="code-block inline-block px-6 py-4 text-left w-full max-w-lg"
+              className="rounded-lg p-4 mb-6 font-mono text-sm space-y-2"
+              style={{ background: "#010806", border: "1px solid rgba(16,185,129,0.1)" }}
             >
-              <div className="text-xs mb-1" style={{ color: "#4a6080" }}># Start everything</div>
-              <div style={{ color: "#60a5fa" }}>$ docker-compose up --build</div>
-              <div className="text-xs mt-2 mb-1" style={{ color: "#4a6080" }}># Run all tests</div>
-              <div style={{ color: "#10b981" }}>$ cd gateway && pytest</div>
-              <div style={{ color: "#10b981" }}>$ cd services/ai_inference && pytest</div>
-              <div style={{ color: "#10b981" }}>$ cd services/event_bus && pytest</div>
+              <div style={{ color: "var(--text-muted)" }}>
+                <span style={{ color: "var(--em-500)" }}>#</span> Start everything
+              </div>
+              <div style={{ color: "var(--em-400)" }}>$ docker-compose up --build</div>
+              <div className="mt-3" style={{ color: "var(--text-muted)" }}>
+                <span style={{ color: "var(--em-500)" }}>#</span> Run all tests
+              </div>
+              <div style={{ color: "#34D399" }}>$ cd gateway && pytest</div>
+              <div style={{ color: "#34D399" }}>$ cd services/ai_inference && pytest</div>
+              <div style={{ color: "#34D399" }}>$ cd services/event_bus && pytest</div>
             </div>
-            <div className="grid grid-cols-3 gap-6 mt-8">
+
+            <div className="grid grid-cols-3 gap-6 text-center">
               {[
                 { label: "Services", value: "4" },
                 { label: "Test Files", value: "8" },
                 { label: "Patterns", value: "6" },
               ].map((s) => (
                 <div key={s.label}>
-                  <div className="text-3xl font-extrabold text-gradient">{s.value}</div>
-                  <div className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
+                  <div className="text-3xl font-extrabold font-mono text-gradient-em">{s.value}</div>
+                  <div className="text-xs font-mono mt-1" style={{ color: "var(--text-muted)" }}>
                     {s.label}
                   </div>
                 </div>

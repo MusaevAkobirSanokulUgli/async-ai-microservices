@@ -17,12 +17,12 @@ interface ServiceCardProps {
   features: string[];
 }
 
-const METHOD_COLORS: Record<string, string> = {
-  GET: "#10b981",
-  POST: "#3b82f6",
-  PUT: "#f59e0b",
-  DELETE: "#ef4444",
-  PATCH: "#8b5cf6",
+const METHOD_STYLES: Record<string, string> = {
+  GET: "method-get",
+  POST: "method-post",
+  PUT: "method-put",
+  DELETE: "method-delete",
+  PATCH: "method-patch",
 };
 
 export default function ServiceCard({
@@ -37,44 +37,61 @@ export default function ServiceCard({
 }: ServiceCardProps) {
   return (
     <div
-      className="rounded-xl p-6 card-hover glass"
-      style={{ border: `1px solid ${color}30` }}
+      className="rounded-lg p-5 card-hover-em transition-all duration-300"
+      style={{
+        background: "var(--bg-card)",
+        border: `1px solid ${color}25`,
+        boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
+      }}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div
-            className="w-10 h-10 rounded-lg flex items-center justify-center text-white"
-            style={{ background: `linear-gradient(135deg, ${color}, ${glowColor})` }}
+            className="w-9 h-9 rounded flex items-center justify-center text-white flex-shrink-0"
+            style={{
+              background: `linear-gradient(135deg, ${color}30, ${glowColor}50)`,
+              border: `1px solid ${color}40`,
+            }}
           >
-            {icon}
+            <span style={{ color }}>{icon}</span>
           </div>
           <div>
-            <h3 className="font-bold text-white text-base">{name}</h3>
+            <h3 className="font-mono font-bold text-sm" style={{ color: "#E2FFF5" }}>{name}</h3>
             <div className="flex items-center gap-2 mt-0.5">
-              <span className="status-dot online" />
-              <span className="text-xs font-mono" style={{ color: color }}>
-                :{port}
+              <span className="status-online" />
+              <span className="text-xs font-mono" style={{ color }}>
+                localhost:{port}
               </span>
             </div>
           </div>
         </div>
+        <div
+          className="px-2 py-0.5 rounded text-xs font-mono"
+          style={{
+            background: "rgba(16,185,129,0.08)",
+            border: "1px solid rgba(16,185,129,0.15)",
+            color: "var(--em-400)",
+          }}
+        >
+          ONLINE
+        </div>
       </div>
 
-      <p className="text-sm mb-5 leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+      <p className="text-xs mb-4 leading-relaxed font-mono" style={{ color: "var(--text-secondary)" }}>
         {description}
       </p>
 
       {/* Features */}
-      <div className="flex flex-wrap gap-2 mb-5">
+      <div className="flex flex-wrap gap-1.5 mb-4">
         {features.map((f) => (
           <span
             key={f}
-            className="px-2 py-0.5 rounded text-xs font-medium"
+            className="px-2 py-0.5 rounded text-xs font-mono"
             style={{
-              background: `${color}15`,
-              color: color,
-              border: `1px solid ${color}30`,
+              background: `${color}12`,
+              color,
+              border: `1px solid ${color}25`,
             }}
           >
             {f}
@@ -85,28 +102,27 @@ export default function ServiceCard({
       {/* Endpoints */}
       <div>
         <div
-          className="text-xs font-semibold mb-2 uppercase tracking-wide"
-          style={{ color: "var(--text-secondary)" }}
+          className="text-xs font-mono font-semibold mb-2 uppercase tracking-widest"
+          style={{ color: "var(--text-muted)" }}
         >
           Endpoints
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           {endpoints.map((ep) => (
             <div
               key={ep.path}
-              className="flex items-center gap-2 rounded-lg px-3 py-1.5"
-              style={{ background: "rgba(6,12,24,0.6)" }}
+              className="flex items-center gap-2 rounded px-2.5 py-1.5"
+              style={{ background: "rgba(1,8,6,0.6)", border: "1px solid rgba(16,185,129,0.06)" }}
             >
-              <span
-                className="text-xs font-bold font-mono w-14 flex-shrink-0"
-                style={{ color: METHOD_COLORS[ep.method] }}
-              >
+              <span className={`text-xs font-bold font-mono px-1.5 py-0.5 rounded ${METHOD_STYLES[ep.method]}`}>
                 {ep.method}
               </span>
-              <span className="text-xs font-mono text-white flex-1 truncate">{ep.path}</span>
+              <span className="text-xs font-mono flex-1 truncate" style={{ color: "#E2FFF5" }}>
+                {ep.path}
+              </span>
               <span
-                className="text-xs hidden sm:block truncate max-w-32"
-                style={{ color: "var(--text-secondary)" }}
+                className="text-xs font-mono hidden sm:block truncate max-w-28"
+                style={{ color: "var(--text-muted)" }}
               >
                 {ep.description}
               </span>
