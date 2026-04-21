@@ -128,7 +128,7 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-6">
             <a
-              href="https://github.com"
+              href="https://github.com/MusaevAkobirSanokulUgli/async-ai-microservices"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 text-xs font-mono transition-colors"

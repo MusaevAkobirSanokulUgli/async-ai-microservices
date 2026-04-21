@@ -113,12 +113,6 @@ const SERVICE_ENDPOINTS: Record<string, { label: string; endpoints: { method: st
   },
 };
 
-const SERVICE_BASE_URLS: Record<string, string> = {
-  gateway: "http://localhost:8000",
-  ai_inference: "http://localhost:8000/api/v1/services/ai_inference",
-  document_processor: "http://localhost:8000/api/v1/services/document_processor",
-  event_bus: "http://localhost:8000/api/v1/services/event_bus",
-};
 
 const STREAM_TOPICS = [
   { topic: "document.uploaded", source: "DocProcessor", color: "#34D399" },
@@ -1037,7 +1031,7 @@ export default function DemoPage() {
           >
             <span style={{ color: "var(--em-500)" }}>NOTE:</span> All responses are simulated. Clone the repo and run{" "}
             <code style={{ color: "var(--em-400)" }}>docker-compose up --build</code> to connect to live services.
-            CORS is configured for localhost:3000. OpenAI API key is optional for AI Inference.
+            All demos are client-side simulations. Run Docker Compose locally to connect to live services.
           </div>
 
         </div>

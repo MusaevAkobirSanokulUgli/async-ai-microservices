@@ -126,7 +126,7 @@ export default function Header() {
             </div>
 
             <a
-              href="https://github.com"
+              href="https://github.com/MusaevAkobirSanokulUgli/async-ai-microservices"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-3 py-1.5 rounded text-xs font-mono font-medium transition-all duration-200"

@@ -61,7 +61,7 @@ export default function ServiceCard({
             <div className="flex items-center gap-2 mt-0.5">
               <span className="status-online" />
               <span className="text-xs font-mono" style={{ color }}>
-                localhost:{port}
+                Port: {port}
               </span>
             </div>
           </div>
