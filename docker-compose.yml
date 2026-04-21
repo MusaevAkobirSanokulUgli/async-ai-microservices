@@ -1,0 +1,116 @@
+version: "3.9"
+
+services:
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - ai-inference
+      - document-processor
+      - event-bus
+    environment:
+      - GATEWAY_AI_INFERENCE_URL=http://ai-inference:8001
+      - GATEWAY_DOC_PROCESSOR_URL=http://document-processor:8002
+      - GATEWAY_EVENT_BUS_URL=http://event-bus:8003
+      - GATEWAY_LOG_LEVEL=INFO
+      - GATEWAY_REQUESTS_PER_MINUTE=60
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  ai-inference:
+    build:
+      context: ./services/ai_inference
+      dockerfile: Dockerfile
+    container_name: ai-inference
+    ports:
+      - "8001:8001"
+    environment:
+      - AI_OPENAI_API_KEY=${OPENAI_API_KEY:-sk-placeholder}
+      - AI_MAX_CONCURRENT_REQUESTS=10
+      - AI_LOG_LEVEL=INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  document-processor:
+    build:
+      context: ./services/document_processor
+      dockerfile: Dockerfile
+    container_name: document-processor
+    ports:
+      - "8002:8002"
+    depends_on:
+      - mongodb
+    environment:
+      - DOC_MONGODB_URL=mongodb://mongodb:27017
+      - DOC_MAX_CONCURRENT_PROCESSING=5
+      - DOC_LOG_LEVEL=INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  event-bus:
+    build:
+      context: ./services/event_bus
+      dockerfile: Dockerfile
+    container_name: event-bus
+    ports:
+      - "8003:8003"
+    environment:
+      - EVENT_MAX_RETRIES=3
+      - EVENT_HANDLER_TIMEOUT=30.0
+      - EVENT_LOG_LEVEL=INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  mongo_data:
+    driver: local
+  redis_data:
+    driver: local
