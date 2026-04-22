@@ -758,6 +758,25 @@ export default function DemoPage() {
       <div className="pt-28 pb-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
 
+          {/* Live DeepSeek banner */}
+          <a href="/live" className="block mb-6 p-4 rounded-2xl transition-all hover:scale-[1.01]"
+            style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.12), rgba(52,211,153,0.06))",
+              border: "1px solid rgba(16,185,129,0.3)" }}>
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div>
+                <div className="text-sm font-bold uppercase tracking-wider mb-1" style={{ color: "#34D399" }}>
+                  🔥 Live DeepSeek-Powered Demo — Now Available
+                </div>
+                <div className="text-xs" style={{ color: "#94A3B8" }}>
+                  Real AI inference with editable prompts, LRU cache, and document processing pipeline.
+                </div>
+              </div>
+              <span className="text-xs font-bold px-4 py-2 rounded-xl" style={{ background: "#10B981", color: "#022C22" }}>
+                Try it →
+              </span>
+            </div>
+          </a>
+
           {/* Page header */}
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-2">
